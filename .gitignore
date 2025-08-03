@@ -31,3 +31,9 @@ coverage
 
 test-results/
 playwright-report/
+#environment variables
+.env
+#python venv
+venv/
+#personal
+oauth.sh
