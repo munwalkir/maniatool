@@ -7,7 +7,6 @@ import { isAuthenticated } from '@/auth'
 const routes = [
   { path: '/', name: 'Dashboard', component: App, meta: { requiresAuth: true } },
   { path: '/login', name: 'Login', component: LoginPage },
-  { path: '/', redirect: '/login' },
   { path: '/callback', name: 'Callback', component: CallbackPage },
 ]
 

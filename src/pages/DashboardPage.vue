@@ -1,4 +1,16 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { isAuthenticated } from '@/auth'
+
+const router = useRouter()
+
+onMounted(() => {
+  if (!isAuthenticated()) {
+    router.push('/login')
+  }
+})
+</script>
 
 <template>
   <div class="dashboard">

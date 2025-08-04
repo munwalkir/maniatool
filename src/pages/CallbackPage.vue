@@ -9,12 +9,12 @@ onMounted(async () => {
   const code = route.query.code as string | undefined
   if (!code) {
     alert('No code found in URL')
-    router.push('/')
+    router.push('/login')
     return
   }
 
   try {
-    const res = await fetch(`http://localhost:9931/callback?code=${code}`)
+    const res = await fetch(`http://localhost:9831/callback?code=${code}`)
     if (!res.ok) throw new Error('Token exchange failed')
 
     const data = await res.json()
@@ -27,7 +27,7 @@ onMounted(async () => {
     router.push('/')
   } catch (err) {
     alert('Login failed: ' + (err as Error).message)
-    router.push('/')
+    router.push('/login')
   }
 })
 </script>
