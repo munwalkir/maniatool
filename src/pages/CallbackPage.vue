@@ -34,6 +34,8 @@ onMounted(async () => {
 
 <template>
   <div class="flex justify-center items-center min-h-screen">
-    <p>Logging in, please wait...</p>
+    <h1 class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-4xl">
+      You will be redirected soon...
+    </h1>
   </div>
 </template>
