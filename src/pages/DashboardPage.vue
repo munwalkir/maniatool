@@ -6,6 +6,8 @@ import { isAuthenticated } from '@/auth'
 const router = useRouter()
 const userData = ref<any>(null)
 const loading = ref(true)
+const showCookiePrompt = ref(false)
+const cookieInput = ref('')
 
 onMounted(() => {
   if (!isAuthenticated()) {
@@ -13,12 +15,34 @@ onMounted(() => {
     return
   }
 
-  fetchUserData()
+  // cookie check
+  const cookie = localStorage.getItem('osu_session_cookie')
+  if (!cookie) {
+    showCookiePrompt.value = true
+  } else {
+    fetchUserData()
+  }
 })
+
+const validateAndSaveCookie = () => {
+  const cookie = cookieInput.value.trim()
+
+  // cookie validation (ts WONT work)
+  if (
+    cookie.length < 20 ||
+    (!cookie.includes('osu_session=') && !cookie.match(/^[a-zA-Z0-9%]+$/))
+  ) {
+    alert('Invalid cookie format. Please make sure you copied the full osu_session cookie value.')
+    return
+  }
+
+  localStorage.setItem('osu_session_cookie', cookie)
+  showCookiePrompt.value = false
+  fetchUserData()
+}
 
 const fetchUserData = async () => {
   const token = localStorage.getItem('osu_access_token')
-  console.log('Token exists:', !!token)
 
   try {
     loading.value = true
@@ -30,17 +54,11 @@ const fetchUserData = async () => {
       },
     })
 
-    console.log('Backend response status:', response.status)
-    console.log('Backend response ok:', response.ok)
-
     if (!response.ok) {
-      const errorText = await response.text()
-      console.log('Backend error response:', errorText)
       throw new Error(`HTTP ${response.status}`)
     }
 
     const data = await response.json()
-    console.log('USER DATA RECEIVED:', data)
     userData.value = data
   } catch (error) {
     console.error('API Error:', error)
@@ -56,17 +74,65 @@ const formatNumber = (num: number | undefined) => {
 const formatPP = (pp: number | undefined) => {
   return pp ? Math.round(pp).toLocaleString() + 'pp' : 'N/A'
 }
+
+const API_BASE = 'http://localhost:9731'
+const token = localStorage.getItem('osu_access_token')
+
+fetch(`${API_BASE}/user-scores`, {
+  method: 'POST',
+  body: JSON.stringify({
+    access_token:
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI0Mjk1NyIsImp0aSI6ImE2ODE5YTU3MWRhYjlhOWM4OTNjMTUzMjZiOTA3NWEwNDA2N2IwMmQ0Y2VjOGI1NWU2NjZmZDlhNDczZDdlZmI2NjlkYmRmMDE5ZWFkOTFhIiwiaWF0IjoxNzU1Mjg5NjY4LjM3NzI4OCwibmJmIjoxNzU1Mjg5NjY4LjM3NzI5LCJleHAiOjE3NTUzNzYwNjguMzU1NDQsInN1YiI6IjM3NTE1NzQ1Iiwic2NvcGVzIjpbImlkZW50aWZ5IiwicHVibGljIl19.hNdNYLalC0vO-AuajSGAD_L5_5eiS3My9kjKxsIKcpdk9tuSegLA65OQsIPp2qyoM_dnpUrOX_e1NsAbGgwFASUMXGeljHB028BR1ZWxnhHsMp_xc8dFy42p4AT6F0YMIoqJFws62bePHqfoWscY_lou8ZEMk7HA1VmDV4VSvxB8xHfHaOVJA_7x1KIDQhzG-4Y2RSwyo12Nj3x92hugrR5QdYlD0qE5NAth8L8gfKEq72B3CEdqMqGE_tyqPb4v59uUnmcf8GfXNCbOFHOrcs1sRJC7XGTS29Z0VEyT48QPjbze7BTaN_mkFl92CmHaN8ZV7ISvGkPLvzciijzuv_O-oPCNdv6PR-_wKjSOIH06SK9gEqddS4f5gQQ9qFs5bvR12VIhDs6YOIuZk9o8srQBNCPga6cKnS0ZhA8Nn2iBBYLeksFrDiwghnyYcmvK92NzokFXPHqcMIzl_lj8BZ_VJhPKtji1ySbf-i7qDA1vjqpjpbbtIqk4F0bi49QZjzmHooilbFFCdv_MQaqwtQfe2SolBYOjgHSQjeIxZDnpnoUbQpxag9ba-aj1bHXGwEtCPlgJ7IXN6YuTPvhxnYMvbCoK7KlEVp9cuNas1CpNvydZiTD7i4QLUMZSSLk441pTyy6ACSnIUbCNmTUDCkJVZ0g4dawXyvkBJIPoCy4',
+  }),
+  headers: {
+    Authorization: `${token}`,
+    'Content-Type': 'application/json',
+  },
+})
 </script>
 
 <template>
   <nav class="sticky top-0 bg-pink-400 border-container-200">
-    <div class="sticky top-0 max-w-screen-xl flex flex-wrap items-center justify-start p-4">
+    <div class="sticky top-0 max-w-screen-xl flex items-center justify-start p-4 space-x-32">
       <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
-        <img src="/public/mania.ico" alt="Logo" class="w-8 h-8" />
+        <img src="/mania.ico" alt="Logo" class="w-8 h-8" />
         <span class="text-white text-4xl font-semibold whitespace-nowrap">maniatool</span>
+      </a>
+      <a href="/analyze" class="flex items-center space-x-3 rtl:space-x-reverse">
+        <span href="/analyze" class="text-white text-4xl font-semibold whitespace-nowrap"
+          >analyze</span
+        >
       </a>
     </div>
   </nav>
+
+  <!-- cookie prompt -->
+  <div
+    v-if="showCookiePrompt"
+    class="fixed inset-0 bg-background bg-opacity-50 flex items-center justify-center z-50"
+  >
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+      <h3 class="text-lg font-bold mb-4">osu! Cookie Needed</h3>
+      <p class="text-sm text-gray-600 mb-4">
+        We need your osu! session cookie to download beatmaps. It's stored locally and only used for
+        beatmap downloads.
+      </p>
+      <input
+        v-model="cookieInput"
+        type="password"
+        placeholder="osu_session=..."
+        class="w-full p-3 border border-pink-600 outline-0 rounded mb-4"
+      />
+      <button
+        @click="validateAndSaveCookie"
+        :disabled="!cookieInput.trim()"
+        class="w-full bg-pink-400 text-white p-3 rounded hover:bg-pink-500 cursor-pointer disabled:cursor-auto disabled:bg-gray-300"
+      >
+        Save Cookie
+      </button>
+    </div>
+  </div>
+
   <div class="w-full px-4 grid grid-cols-12 gap-4 mt-4">
     <div class="col-span-4 flex flex-col gap-4 h-[89vh]">
       <div class="flex-[2] bg-container rounded-4xl flex items-center justify-start pl-[4vh]">

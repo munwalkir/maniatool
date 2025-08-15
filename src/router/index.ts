@@ -2,10 +2,12 @@ import { createRouter, createWebHistory } from 'vue-router'
 import App from '@/pages/DashboardPage.vue'
 import CallbackPage from '@/pages/CallbackPage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
+import AnalyzePage from '@/pages/AnalyzePage.vue'
 import { isAuthenticated } from '@/auth'
 
 const routes = [
   { path: '/', name: 'Dashboard', component: App, meta: { requiresAuth: true } },
+  { path: '/analyze', name: 'Analyze', component: AnalyzePage, meta: { requiresAuth: true } },
   { path: '/login', name: 'Login', component: LoginPage },
   { path: '/callback', name: 'Callback', component: CallbackPage },
 ]

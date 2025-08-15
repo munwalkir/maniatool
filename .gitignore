@@ -37,3 +37,6 @@ playwright-report/
 venv/
 #personal
 oauth.sh
+backend/downloads
+backend/backups
+backend/api_debug.log

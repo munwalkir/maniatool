@@ -17,3 +17,13 @@ body {
   background-color: #2e2e2e;
   font-family: 'Torus', Arial, Helvetica, sans-serif;
 }
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
