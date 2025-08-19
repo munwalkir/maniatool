@@ -100,6 +100,7 @@ class BeatmapsetListResponse(BaseModel):
 class UserScoreInfo(BaseModel):
     pp: Optional[float]
     accuracy: float
+    accuracyV2: float
     beatmap_id: int
     difficulty_name: str
     mods: str
@@ -243,6 +244,7 @@ async def get_user_scores(request: UserScoreRequest):
                 best_scores.append(UserScoreInfo(
                     pp=score['pp'],
                     accuracy=score['accuracy'],
+                    accuracyV2=score['accuracyV2'],
                     beatmap_id=score['beatmap_id'],
                     difficulty_name=score['difficulty_name'],
                     mods=score['mods'],
@@ -270,6 +272,7 @@ async def get_user_scores(request: UserScoreRequest):
                 recent_scores.append(UserScoreInfo(
                     pp=score['pp'],
                     accuracy=score['accuracy'],
+                    accuracyV2=score['accuracyV2'],
                     beatmap_id=score['beatmap_id'],
                     difficulty_name=score['difficulty_name'],
                     mods=score['mods'],

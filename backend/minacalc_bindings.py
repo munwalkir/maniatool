@@ -314,7 +314,7 @@ def parse_sm_file(sm_file_path: str) -> List[Tuple[int, float]]:
             note_density_window.append((time, bin(notes).count('1')))
 
             total_notes_in_window = sum(n for _, n in note_density_window)
-            if total_notes_in_window > 50:  #spam asf
+            if total_notes_in_window > 300:  #spam asf
                 print(f"Warning: High note density detected at time {time:.3f}, might be conversion artifact")
                 continue
 
